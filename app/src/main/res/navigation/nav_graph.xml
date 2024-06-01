@@ -1,0 +1,40 @@
+<?xml version="1.0" encoding="utf-8"?>
+<navigation xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/nav_graph"
+    app:startDestination="@id/mainFragment">
+
+    <fragment
+        android:id="@+id/authorizationFragment"
+        android:name="com.mirea.kt.ribo.afishamoscow.AuthorizationFragment"
+        android:label="fragment_authorization"
+        tools:layout="@layout/fragment_authorization">
+        <action
+            android:id="@+id/action_authorizationFragment_to_mainFragment"
+            app:destination="@id/mainFragment" />
+    </fragment>
+    <fragment
+        android:id="@+id/mainFragment"
+        android:name="com.mirea.kt.ribo.afishamoscow.MainFragment"
+        android:label="fragment_main"
+        tools:layout="@layout/fragment_main">
+        <action
+            android:id="@+id/action_mainFragment_to_eventsFragment"
+            app:destination="@id/eventsFragment"/>
+    </fragment>
+    <fragment
+        android:id="@+id/eventPageFragment"
+        android:name="com.mirea.kt.ribo.afishamoscow.EventPageFragment"
+        android:label="fragment_event_page"
+        tools:layout="@layout/fragment_event_page" />
+    <fragment
+        android:id="@+id/eventsFragment"
+        android:name="com.mirea.kt.ribo.afishamoscow.EventsFragment"
+        android:label="fragment_events"
+        tools:layout="@layout/fragment_events">
+        <action
+            android:id="@+id/action_eventsFragment_to_eventPageFragment"
+            app:destination="@id/eventPageFragment"/>
+    </fragment>
+</navigation>

@@ -1,0 +1,16 @@
+<resources>
+    <string name="app_name">Афиша Москва</string>
+    <string name="authorization">Авторизация</string>
+    <string name="login">Логин</string>
+    <string name="password">Пароль</string>
+    <string name="enter">Войти</string>
+    <string name="whoDo">Цуранов Артем Юрьевич, РИБО–02–22, Вариант - 55</string>
+    <string name="mirea_logo">MIREA Logo</string>
+    <string name="circle">circle</string>
+    <string name="welcome">Добро пожаловать!</string>
+    <string name="try_again">Ошибка, попробуйте заново</string>
+    <string name="search">Поиск</string>
+    <string name="image">image</string>
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
