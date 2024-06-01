@@ -15,7 +15,6 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent" />
 
-
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -35,8 +34,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
             android:text="Описание:"
-            android:textSize="20sp"/>
-
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/location"
@@ -44,8 +42,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/description"
             android:text="Место:"
-            android:textSize="20sp"/>
-
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/address"
@@ -55,14 +52,13 @@
             android:text="Адрес: "
             android:textSize="20sp" />
 
-
         <TextView
             android:id="@+id/date"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/address"
             android:text="Дата и время:"
-            android:textSize="20sp"/>
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/price"
@@ -78,15 +74,14 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/price"
             android:text="Возрастные ограничения: "
-            android:textSize="20sp"/>
-
+            android:textSize="20sp" />
 
         <TextView
             android:id="@+id/site"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/age"
-            android:text="Сайт:"
+            android:text=""
             android:textSize="20sp" />
     </RelativeLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>
