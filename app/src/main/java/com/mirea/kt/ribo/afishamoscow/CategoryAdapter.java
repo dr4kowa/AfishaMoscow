@@ -57,6 +57,7 @@ public class CategoryAdapter extends RecyclerView.Adapter<CategoryAdapter.ViewHo
         holder.itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putString("slug", category.getCategorySlug());
+            bundle.putString("title", category.getCategoryName());
             controller.navigate(R.id.eventsFragment, bundle);
         });
     }

@@ -71,26 +71,22 @@ public class AuthorizationFragment extends Fragment {
                             JsonObject jsonObject = gson.fromJson(resp, JsonObject.class);
                             int result = jsonObject.get("result_code").getAsInt();
                             Log.i("res", Integer.toString(result));
-                            mainHandler.post(()->{
-                            if (result == 1) {
-                                tvAuth.setText(R.string.welcome);
-                                controller.navigate(R.id.mainFragment);
-                            } else {
-                                tvAuth.setText(R.string.try_again);
-                                tvAuth.setTextSize(28);
-                            }});
+                            mainHandler.post(() -> {
+                                if (result == 1) {
+                                    tvAuth.setText(R.string.welcome);
+                                    controller.navigate(R.id.mainFragment);
+                                } else {
+                                    tvAuth.setText(R.string.try_again);
+                                    tvAuth.setTextSize(28);
+                                }
+                            });
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
                     });
                 }
-            }});
-            return view;
-        }
-
-        @Override
-        public void onActivityCreated (@Nullable Bundle savedInstanceState){
-            super.onActivityCreated(savedInstanceState);
-        }
-
+            }
+        });
+        return view;
     }
+}

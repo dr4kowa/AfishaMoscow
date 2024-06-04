@@ -9,8 +9,5 @@
     <string name="circle">circle</string>
     <string name="welcome">Добро пожаловать!</string>
     <string name="try_again">Ошибка, попробуйте заново</string>
-    <string name="search">Поиск</string>
     <string name="image">image</string>
-    <!-- TODO: Remove or change this placeholder text -->
-    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

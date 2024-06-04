@@ -74,6 +74,7 @@ public class EventAdapter extends RecyclerView.Adapter<EventAdapter.ViewHolder> 
         holder.itemView.setOnClickListener(v -> {
             Bundle bundle = new Bundle();
             bundle.putString("id", event.getIdEvent());
+            bundle.putString("title", event.getName());
             controller.navigate(R.id.eventPageFragment, bundle);
         });
     }

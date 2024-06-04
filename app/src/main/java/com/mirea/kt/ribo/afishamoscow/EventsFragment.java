@@ -20,6 +20,7 @@ import android.widget.TextView;
 
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mirea.kt.ribo.afishamoscow.databinding.FragmentEventsBinding;
 
@@ -39,6 +40,7 @@ public class EventsFragment extends Fragment {
 
     Calendar calendar = Calendar.getInstance();
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
+    SimpleDateFormat dateFormat2 = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.getDefault());
     private Handler backgroundHandler, mainHandler;
     private EventAdapter eventAdapter;
     private TextView tvCount;
@@ -55,7 +57,7 @@ public class EventsFragment extends Fragment {
         FragmentEventsBinding binding = FragmentEventsBinding.bind(view);
         NavController controller = Navigation.findNavController(requireActivity(), R.id.fragment_container_view);
         Bundle bundle = getArguments();
-
+        binding.categoryName.setText(bundle.getString("title"));
         assert bundle != null;
         String categorySlug = bundle.getString("slug");
         tvCount = binding.numbZagruz;
@@ -67,22 +69,27 @@ public class EventsFragment extends Fragment {
             });
             int zagruzCount = 0;
             ArrayList<String> idEvents = loadID(categorySlug);
+            mainHandler.post(() -> {
+                binding.categoryName.setVisibility(View.GONE);
+                binding.progress.setVisibility(View.GONE);
+                binding.rvEvents.setVisibility(View.VISIBLE);
+                binding.numbZagruz.setVisibility(View.VISIBLE);
+            });
             ArrayList<Event> events = new ArrayList<>();
             eventAdapter = new EventAdapter(events, controller);
             mainHandler.post(() -> {
                 RecyclerView rvEvents = binding.rvEvents;
-                rvEvents.setLayoutManager(new GridLayoutManager(getActivity(), 2, GridLayoutManager.VERTICAL, false));
                 rvEvents.setAdapter(eventAdapter);
             });
-            while (isVisible() && zagruzCount<totalCount){
+            while (isVisible() && zagruzCount < totalCount) {
                 String id = idEvents.get(zagruzCount);
                 events.add(loadEvents(id));
                 zagruzCount++;
                 int finalZagruzCount = zagruzCount;
                 mainHandler.post(() -> {
-                eventAdapter.notifyItemInserted(events.size() - 1);
-                tvCount.setText("Загружено: " + finalZagruzCount + "/" + totalCount);
-            });
+                    eventAdapter.notifyItemInserted(events.size() - 1);
+                    tvCount.setText("Загружено: " + finalZagruzCount + "/" + totalCount);
+                });
             }
         });
     }
@@ -181,22 +188,31 @@ public class EventsFragment extends Fragment {
             Log.i("Ok", title);
             //парсинг даты
             JsonArray datesArray = jsonObject2.getAsJsonArray("dates");
-            String currentDate = dateFormat.format(calendar.getTime());
-            String date;
-            long curDate = dateFormat.parse(currentDate).getTime() / 1000;
-            if (datesArray.get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong() > 0) {
-                SimpleDateFormat sdt = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
-                long startDate = jsonObject2.getAsJsonArray("dates").get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong();
-                date = sdt.format(new Date(startDate * 1000));
-
-                //Log.i("Ok", date + "|||" + curDate + "|||" + startDate);
-            } else {
-                date = "Каждый день";
+            String currentDate = dateFormat2.format(calendar.getTime());
+            String date = null;
+            long curDate = dateFormat2.parse(currentDate).getTime();
+            int index = 0;
+            for (JsonElement dateElement : datesArray) {
+                JsonObject dateObject = dateElement.getAsJsonObject();
+                long startDate = dateObject.get("start").getAsLong() * 1000;
+                String start = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(new Date(startDate));
+                long endDate = dateObject.get("end").getAsLong() * 1000;
+                String end = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault()).format(new Date(endDate));
+                if (curDate < startDate) {
+                    date = start;
+                    break;
+                } else if (curDate >= startDate && curDate <= endDate) {
+                    date = "Открыто до " + end;
+                    break;
+                } else if (curDate > startDate && index == datesArray.size()-1) {
+                    date = "Открыто с " + start;
+                    break;
+                }
+                index ++;
             }
             // парсинг фото
             JsonArray imageArray = jsonObject2.getAsJsonArray("images");
             String photo = imageArray.get(0).getAsJsonObject().get("image").getAsString();
-            //Log.i("Ok", photo);
             // парсинг локации
             String placeId;
             String placeTitle = null;
@@ -211,12 +227,10 @@ public class EventsFragment extends Fragment {
                 String responseDataPlace = responsePlace.body().string();
                 JsonObject jsonObjectPlace = gson.fromJson(responseDataPlace, JsonObject.class);
                 placeTitle = jsonObjectPlace.get("title").getAsString();
-                //Log.i("Ok", placeTitle);
             } catch (Exception e) {
                 placeTitle = null;
             }
-            event = new Event(title, date, placeTitle, null, null, photo, idEvent, null, null, null, null,null,null);
-
+            event = new Event(title, date, placeTitle, null, null, photo, idEvent, null, null, null, null, null, null);
 
 
         } catch (IOException e) {

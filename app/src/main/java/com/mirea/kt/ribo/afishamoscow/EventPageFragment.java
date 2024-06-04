@@ -1,12 +1,17 @@
 package com.mirea.kt.ribo.afishamoscow;
 
+import android.content.Context;
 import android.content.Intent;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.net.Uri;
 import android.os.Bundle;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 
 import android.os.Handler;
 import android.os.Looper;
@@ -41,10 +46,20 @@ public class EventPageFragment extends Fragment {
     SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd", Locale.getDefault());
     private Handler backgroundHandler, mainHandler;
 
+
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         FragmentEventPageBinding binding = FragmentEventPageBinding.bind(view);
+        NavController controller = Navigation.findNavController(requireActivity(), R.id.fragment_container_view);
+        Bundle bundle = getArguments();
+        assert bundle != null;
+        String eventID = bundle.getString("id");
+        binding.eventTitle.setText(bundle.getString("title"));
+        binding.imBack.setOnClickListener(v -> {
+            controller.navigateUp();
+        });
+
         TextView tvTitle = binding.title;
         TextView tvAge = binding.age;
         TextView tvDate = binding.date;
@@ -54,8 +69,6 @@ public class EventPageFragment extends Fragment {
         ImageView ivImage = binding.image;
         TextView tvSite = binding.site;
         TextView tvAddress = binding.address;
-        Bundle bundle = getArguments();
-        String eventID = bundle.getString("id");
         BackgroundHandlerThread backgroundHandlerThread = new BackgroundHandlerThread("bht");
         backgroundHandlerThread.start();
         backgroundHandler = new Handler(backgroundHandlerThread.getLooper());
@@ -64,7 +77,9 @@ public class EventPageFragment extends Fragment {
             try {
                 Event event = zagruzEvent(eventID);
                 mainHandler.post(() -> {
-                    //переделать здесь все
+                    binding.progress.setVisibility(View.GONE);
+                    binding.eventTitle.setVisibility(View.GONE);
+                    binding.constraint2.setVisibility(View.VISIBLE);
                     tvTitle.setText(Html.fromHtml(event.getName()));
                     tvAge.setText(Html.fromHtml(event.getAge()));
                     tvDate.setText(Html.fromHtml(event.getDate()));
@@ -84,6 +99,7 @@ public class EventPageFragment extends Fragment {
                             .load(event.getPhoto())
                             .centerCrop()
                             .into(ivImage);
+
                 });
             } catch (Exception e) {
             }
@@ -98,7 +114,6 @@ public class EventPageFragment extends Fragment {
         return view;
     }
 
-    //парсинг события
     private Event zagruzEvent(String idEv) throws IOException, ParseException {
         Event event = new Event();
         OkHttpClient client = new OkHttpClient();
@@ -106,7 +121,6 @@ public class EventPageFragment extends Fragment {
         String urlEv = "https://kudago.com/public-api/v1.4/events/" + idEv;
         Log.i("Ok", urlEv);
         Gson gson = new Gson();
-
         Request requestEvents = new Request.Builder()
                 .url(urlEv)
                 .build();
@@ -115,33 +129,37 @@ public class EventPageFragment extends Fragment {
             assert response2.body() != null;
             String responseData2 = response2.body().string();
             JsonObject jsonObject2 = gson.fromJson(responseData2, JsonObject.class);
-            // парсинг названия
-            String title = jsonObject2.get("title").getAsString();
-            title = title.substring(0, 1).toUpperCase() + title.substring(1);
-            title = "<b>Название:</b> " + "<i>"+title+"</i>";
-            Log.i("Ok", title);
-            // парсинг даты
+            String title = null;
+            try {
+                title = jsonObject2.get("title").getAsString();
+                title = title.substring(0, 1).toUpperCase() + title.substring(1);
+                title = "<b>Название:</b> " + "<i>" + title + "</i>";
+            } catch (Exception e) {
+                Log.e("NeOk", "1");
+            }
             JsonArray datesArray = jsonObject2.getAsJsonArray("dates");
-            String date;
+            String date = null;
             long curDate = dateFormat.parse(currentDate).getTime() / 1000;
             int flag = 0;
             String dateStart;
             String dateEnd;
-            while (!(curDate > datesArray.get(flag).getAsJsonObject().get("start").getAsLong() || curDate < datesArray.get(flag).getAsJsonObject().get("end").getAsLong())) {
-                flag++;
-                Log.i("date", Boolean.toString(curDate > datesArray.get(flag).getAsJsonObject().get("start").getAsLong()));
-            }
+            try {
+                while (!(curDate > datesArray.get(flag).getAsJsonObject().get("start").getAsLong() || curDate < datesArray.get(flag).getAsJsonObject().get("end").getAsLong())) {
+                    flag++;
+                    Log.i("date", Boolean.toString(curDate > datesArray.get(flag).getAsJsonObject().get("start").getAsLong()));
+                }
+                if (datesArray.get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong() > 0) {
+                    SimpleDateFormat sdt = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
+                    long startDate = datesArray.get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong();
+                    date = "<b>Дата и время:</b> " + sdt.format(new Date(startDate * 1000));
 
-            if (datesArray.get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong() > 0) {
-                SimpleDateFormat sdt = new SimpleDateFormat("dd.MM.yyyy HH:mm", Locale.getDefault());
-                long startDate = datesArray.get(datesArray.size() - 1).getAsJsonObject().get("start").getAsLong();
-                date = "<b>Дата и время:</b> "+sdt.format(new Date(startDate * 1000));
-
-                Log.i("Ok", date + "|||" + curDate + "|||" + startDate);
-            } else {
-                date = "<b>Дата и время:</b> Каждый день";
+                    Log.i("Ok", date + "|||" + curDate + "|||" + startDate);
+                } else {
+                    date = "<b>Дата и время:</b> Каждый день";
+                }
+            } catch (Exception e) {
+                Log.e("NeOk", "2");
             }
-            // парсинг локации
             String placeId;
             String place = null, placeTitle = null, placeAddress = null, lon = null, lat = null;
             try {
@@ -159,31 +177,50 @@ public class EventPageFragment extends Fragment {
                 lat = placeCoords.get("lat").getAsString();
                 lon = placeCoords.get("lon").getAsString();
                 Log.d("coords", lat + "  " + lon);
-                placeAddress ="<b>Адрес:</b> " + "<u><font color='#0000FF'>"+jsonObjectPlace.get("address").getAsString()+"</font></u>";
+                placeAddress = "<b>Адрес:</b> " + "<u><font color='#0000FF'>" + jsonObjectPlace.get("address").getAsString() + "</font></u>";
                 Log.i("Ok", placeTitle);
             } catch (Exception e) {
                 placeTitle = "<b>Место:</b> -";
                 placeAddress = "<b>Адрес:</b> -";
+                Log.d("NeOk", "3");
             }
-            // парсинг описания
-            String description = "<b>Описание:</b> " + jsonObject2.get("description").getAsString().replaceAll("<[^>]*>", "");
-            ;
-            // парсинг фото
-            JsonArray imageArray = jsonObject2.getAsJsonArray("images");
-            String photo = imageArray.get(0).getAsJsonObject().get("image").getAsString();
+            String description = null;
+            try {
+                description = "<b>Описание:</b> " + jsonObject2.get("description").getAsString().replaceAll("<[^>]*>", "");
+            } catch (Exception e) {
+                Log.e("NeOk", "4");
+            }
+            String photo = null;
+            try {
+                JsonArray imageArray = jsonObject2.getAsJsonArray("images");
+                photo = imageArray.get(0).getAsJsonObject().get("image").getAsString();
+            } catch (Exception e) {
+                Log.e("NeOk", "5");
+            }
             Log.i("Ok", photo);
-            // парсинг цены
-            String price;
-            if (jsonObject2.get("price").getAsString().isEmpty()) {
-                price = "<b>Цена:</b> бесплатно";
-            } else {
-                price = "<b>Цена:</b> "+jsonObject2.get("price").getAsString();
+            String price = null;
+            try {
+                if (jsonObject2.get("price").getAsString().isEmpty()) {
+                    price = "<b>Цена:</b> бесплатно";
+                } else {
+                    price = "<b>Цена:</b> " + jsonObject2.get("price").getAsString();
+                }
+            } catch (Exception e) {
+                Log.e("NeOK", "6");
             }
-            //парсинг возрастных ограничений
-            String age = "<b>Возрастные ограничения:</b> " + jsonObject2.get("age_restriction").getAsString();
-            // парсинг сайта
-            String site = "<b>Сайт:</b> " + "<a href='" + jsonObject2.get("site_url").getAsString() + "'>Ссылка на событие</a>";
-
+            String age = null;
+            try {
+                age = "<b>Возрастные ограничения:</b> " + jsonObject2.get("age_restriction").getAsString();
+            } catch (Exception e) {
+                age = "<b>Возрастные ограничения:</b> 0+";
+                Log.e("NeOk", "7");
+            }
+            String site = null;
+            try {
+                site = "<b>Сайт:</b> " + "<a href='" + jsonObject2.get("site_url").getAsString() + "'>Ссылка на событие</a>";
+            } catch (Exception e) {
+                Log.e("NeOk", "8");
+            }
             event = new Event(title, date, placeTitle, placeAddress, description, photo, idEv, null, price, age, site, lon, lat);
         } catch (Exception e) {
             Log.e("NeOK", e.toString());
