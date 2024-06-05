@@ -12,7 +12,7 @@
         tools:layout="@layout/fragment_authorization">
         <action
             android:id="@+id/action_authorizationFragment_to_mainFragment"
-            app:destination="@id/mainFragment"/>
+            app:destination="@id/mainFragment" />
     </fragment>
     <fragment
         android:id="@+id/mainFragment"
@@ -21,7 +21,7 @@
         tools:layout="@layout/fragment_main">
         <action
             android:id="@+id/action_mainFragment_to_eventsFragment"
-            app:destination="@id/eventsFragment"/>
+            app:destination="@id/eventsFragment" />
 
     </fragment>
     <fragment

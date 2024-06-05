@@ -45,7 +45,6 @@ public class EventsFragment extends Fragment {
     private EventAdapter eventAdapter;
     private TextView tvCount;
 
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -204,11 +203,11 @@ public class EventsFragment extends Fragment {
                 } else if (curDate >= startDate && curDate <= endDate) {
                     date = "Открыто до " + end;
                     break;
-                } else if (curDate > startDate && index == datesArray.size()-1) {
+                } else if (curDate > startDate && index == datesArray.size() - 1) {
                     date = "Открыто с " + start;
                     break;
                 }
-                index ++;
+                index++;
             }
             // парсинг фото
             JsonArray imageArray = jsonObject2.getAsJsonArray("images");
@@ -231,8 +230,6 @@ public class EventsFragment extends Fragment {
                 placeTitle = null;
             }
             event = new Event(title, date, placeTitle, null, null, photo, idEvent, null, null, null, null, null, null);
-
-
         } catch (IOException e) {
             Log.e("Ok", e.toString());
         } catch (ParseException e) {

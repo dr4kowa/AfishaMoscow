@@ -7,13 +7,12 @@
     android:background="@color/back1"
     tools:context=".EventPageFragment">
 
-
     <TextView
         android:id="@+id/eventTitle"
         android:layout_width="300dp"
-        android:textAlignment="center"
         android:layout_height="wrap_content"
         android:layout_marginBottom="5dp"
+        android:textAlignment="center"
         android:textColor="@color/grey1"
         android:textSize="32sp"
         android:textStyle="bold"

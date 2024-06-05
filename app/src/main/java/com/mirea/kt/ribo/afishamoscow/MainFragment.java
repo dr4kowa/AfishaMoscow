@@ -1,6 +1,11 @@
 package com.mirea.kt.ribo.afishamoscow;
 
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
+import android.view.LayoutInflater;
+import android.view.View;
+import android.view.ViewGroup;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -10,34 +15,13 @@ import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.os.Handler;
-import android.os.Looper;
-import android.util.Log;
-import android.view.LayoutInflater;
-import android.view.View;
-import android.view.ViewGroup;
-
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonObject;
 import com.google.gson.reflect.TypeToken;
 import com.mirea.kt.ribo.afishamoscow.databinding.FragmentMainBinding;
 
-import org.json.JSONArray;
-import org.json.JSONObject;
-
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStreamReader;
 import java.lang.reflect.Type;
-import java.net.HttpURLConnection;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.Locale;
 
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
@@ -62,7 +46,7 @@ public class MainFragment extends Fragment {
             ArrayList<Category> categories = zagruzCat();
             mainHandler.post(() -> {
                 RecyclerView rvCategories = binding.rvCategories;
-                catAdapter = new CategoryAdapter(categories,controller);
+                catAdapter = new CategoryAdapter(categories, controller);
                 rvCategories.setLayoutManager(new LinearLayoutManager(getActivity(), LinearLayoutManager.VERTICAL, false));
                 rvCategories.setAdapter(catAdapter);
             });

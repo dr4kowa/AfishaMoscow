@@ -1,18 +1,12 @@
 package com.mirea.kt.ribo.afishamoscow;
 
-import androidx.recyclerview.widget.RecyclerView;
-
 import com.google.gson.annotations.SerializedName;
-
-import java.util.ArrayList;
-import java.util.HashMap;
 
 public class Category {
     @SerializedName("name")
     private String categoryName;
     @SerializedName("slug")
     private String categorySlug;
-
 
     public Category(String categoryName, String categorySlug) {
         this.categoryName = categoryName;
@@ -34,6 +28,4 @@ public class Category {
     public void setCategoryName(String categoryName) {
         this.categoryName = categoryName;
     }
-
-
 }
